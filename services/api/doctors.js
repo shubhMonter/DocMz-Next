@@ -13,3 +13,4 @@ export const searchDoctors = body => Axios.post(apiList.searchDoctors, body)
 
 export const getAppointments = ({ limit, doctor, date }) => Axios.post(apiList.getAppointments, { limit, doctor, date })
 export const approveAppointments = body => Axios.post(apiList.approveAppointments, body)
+export const getOrder = body => Axios.post(apiList.getOrder, body)

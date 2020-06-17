@@ -21,7 +21,7 @@ const patientCardList = `${BASE_URL}/stripe/list`
 const getAppointments = `${BASE_URL}/appointment/get`
 const approveAppointments = `${BASE_URL}/appointment/approve`
 
-
+const getOrder = `${BASE_URL}/razorpay/createorder`
 export default {
     getSpecialities,
     getDoctorsList,
@@ -42,4 +42,6 @@ export default {
 
     getAppointments,
     approveAppointments,
+
+    getOrder
 }
