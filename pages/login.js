@@ -32,6 +32,7 @@ class login extends Component {
         Router.push("/doctor/newdash");
       }
     }
+    
   }
   handleSubmit = e => {
     e.preventDefault();

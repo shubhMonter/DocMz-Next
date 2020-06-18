@@ -28,7 +28,7 @@ export default class AddressSearchInput extends Component{
  }
   render() {
     const { address } = this.state;
-    console.log("address",address,this.props);
+   // console.log("address",address,this.props);
    
     return (
       <PlacesAutocomplete onChange={this.handleAddressChange} onSelect={this.props.onAddressSelect} value={address}>

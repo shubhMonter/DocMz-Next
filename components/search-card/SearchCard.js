@@ -7,9 +7,7 @@ import AppointmentCard from "../AppointmentCard/AppointmentCard"
 import { getName, getAddress, getTaxonomy } from '../../services/extra/DoctorHelpers';
 
 const SearchCard = ({doctor, dates, onlyDates, showControl, onDateChange}) => {
-    console.log({
-        doctor
-    })
+   
     const [isFav, setIsFav] = useState(false)
     const slider = useRef()
     const next = () => {

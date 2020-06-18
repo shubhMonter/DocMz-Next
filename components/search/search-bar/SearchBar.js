@@ -14,14 +14,22 @@ class SearchBar extends Component {
     render() {
         const {
             isFilterOpen
-        } = this.state
+        } = this.state;
+        let {specialities} = this.props;
+        const arrayToObject = (array) =>
+            array.reduce((obj, item) => {
+                obj[item._id] = item
+                return obj
+            }, {});
+          specialities = arrayToObject(specialities);
+          
         return (
             // <Affix offsetTop={0}>
                 <div className="c-search-bar bg-dark">
                     <div className="container p-3">
                         <div className="row">
                             <div className="col-lg-11">
-                                <SearchCore onSearch={this.props.getSearch} />
+                                <SearchCore onSearch={this.props.getSearch} specialities={specialities} />
                             </div>
                             <div className="col-lg-1">
                                 <button onClick={this.toggleFilter} className="btn btn-block btn-outline-primary">

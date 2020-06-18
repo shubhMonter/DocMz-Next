@@ -1,14 +1,18 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import { compose } from "redux";
+import { connect } from "react-redux";
 import { Select, DatePicker, Spin, Icon, Divider, Row, Col, Button, Steps, List } from 'antd';
 import { SEARCH_BOX_HEADING } from '../../../constants/messages/default'
 import { getSpecialities } from '../../../services/api';
 import AddressSearchInput from '../../address-search-input/AddressSearchInput';
 import MulitSearchInput from '../../multi-search-input/MulitSearchInput';
 import Router from 'next/router';
+import Search from 'antd/lib/input/Search';
+import propTypes from 'prop-types';
 
 class SearchBox extends Component {
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state = {
             isLoading: true,
             isError: false,
@@ -19,19 +23,21 @@ class SearchBox extends Component {
         }
     }
     componentDidMount(){
-        getSpecialities()
-        .then(res => {
-            this.setState({
-                speciality: res.data?.data || [],
-                popularSpeciality: (res.data?.data || []).filter( speciality => speciality.popular)
-            })
-        })
-        .catch(err => {
-            console.log({err})
-            this.setState({
-                isError: true
-            })
-        })
+        // getSpecialities()
+        // .then(res => {
+        //     this.setState({
+        //         speciality: res.data?.data || [],
+        //         popularSpeciality: (res.data?.data || []).filter( speciality => speciality.popular)
+        //     })
+        // })
+        // .catch(err => {
+        //     console.log({err})
+        //     this.setState({
+        //         isError: true
+        //     })
+        // })
+        
+        
     }
     onSpecialityChange = selectedSpeciality => this.setState({selectedSpeciality})
     onDateChange       = selectedDate       => this.setState({selectedDate})
@@ -44,6 +50,7 @@ class SearchBox extends Component {
             speciality,
             popularSpeciality
         } = this.state
+       
         return (
             <div className="c-search-box">
                 <div className="card">
@@ -53,7 +60,7 @@ class SearchBox extends Component {
                     <div className="px-5 py-4">
                         <div className="row">
                             <div className="col-md-3">
-                            <Select
+                             <Select
                                 suffixIcon={<Icon type="search" />}
                                 showSearch
                                 placeholder="Select Specialty"
@@ -73,7 +80,7 @@ class SearchBox extends Component {
                                             speciality.map((speciality, key) => <Option key={key} value={speciality.speciality_id}>{speciality.name}</Option>)
                                         }
                                     </OptGroup>
-                                </Select>
+                                </Select> 
                             </div>
                             <div className="col-md-3">
                                 <AddressSearchInput className="ant-search-select" />
@@ -101,7 +108,9 @@ class SearchBox extends Component {
         )
     }
 }
-
+SearchBox.propTypes={
+    specialities: propTypes.object.isRequired
+}
 SearchBox.defaultProps = {
     title: SEARCH_BOX_HEADING
 }

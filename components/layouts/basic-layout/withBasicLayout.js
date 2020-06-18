@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Router from "next/router";
+import PropTypes from 'prop-types';
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { PROJECT_NAME, GOOGLE_API_KEY } from "../../../constants/projectKeys";
@@ -43,11 +44,7 @@ const withBasicLayout = PassedComponent => {
 
 		componentDidMount() {
 			this.props.getSpecialities();
-			console.log({
-				getInitialProps: PassedComponent.getInitialProps,
-				PassedComponent,
-				props: this.props
-			});
+			
 			if (this.props.loggedInDoctor._id) {
 				Router.push("/doctor/newdash");
 			}
@@ -61,6 +58,9 @@ const withBasicLayout = PassedComponent => {
 		}
 		render() {
 			const { children, ...props } = this.props;
+			console.log(props);
+			
+			
 			if (!this.props.isPersist || this.props.loggedInDoctor._id) {
 				return (
 					<>
@@ -99,7 +99,10 @@ const withBasicLayout = PassedComponent => {
 		}
 	};
 };
-
+withBasicLayout.protoTypes ={
+	getSpecialities: PropTypes.func.isRequired,
+	specialities: PropTypes.object.isRequired
+}
 const mapStateToProps = state => ({
 	specialities: state.specialities,
 	loggedInDoctor: state.loggedInDoctor

@@ -98,7 +98,7 @@ class MultiSearchInput extends Component {
 
 
     async componentDidMount() {
-        console.log('cariershere', carriers)
+       // console.log('cariershere', carriers)
         // console.log('carriersmap',carriers.map((carrier)))
         const data = carriers.carriers.map((carrier) => ({
             text: `${carrier.name}`,
@@ -111,7 +111,7 @@ class MultiSearchInput extends Component {
 
         this.setState({ loading: true });
         const Specialty = await axios.get(`http://localhost:3001/doctors/get/specialties`)
-        console.log('speciality', Specialty)
+        //console.log('speciality', Specialty)
         let doctors = await Specialty.data.data;
         this.setState({ doctors, loading: false });
 
@@ -139,7 +139,7 @@ class MultiSearchInput extends Component {
         })
     }
     searchSubmit() {
-        console.log("xxxxxxxxx");
+       // console.log("xxxxxxxxx");
         this.props.history.push("/search");
     }
     suffixiconhandler() {

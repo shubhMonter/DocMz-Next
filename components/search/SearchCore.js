@@ -4,10 +4,12 @@ import { SEARCH_BOX_HEADING } from '../../constants/messages/default'
 import { getSpecialities,searchDoctors } from '../../services/api';
 import AddressSearchInput from '../address-search-input/AddressSearchInput';
 import MulitSearchInput from '../multi-search-input/MulitSearchInput';
+import propTypes from 'prop-types';
 
 class SearchCore extends Component {
     constructor(props){
         super(props);
+        
         this.state = {
             isLoading: true,
             isError: false,
@@ -19,22 +21,7 @@ class SearchCore extends Component {
         }
         this.onClick=this.onClick.bind(this);
     }
-    componentDidMount(){
 
-        getSpecialities()
-        .then(res => {
-            this.setState({
-                speciality: res.data?.data || [],
-                popularSpeciality: (res.data?.data || []).filter( speciality => speciality.popular)
-            })
-        })
-        .catch(err => {
-            console.log({err})
-            this.setState({
-                isError: true
-            })
-        })
-    }
     onSpecialityChange = selectedSpeciality => this.setState({selectedSpeciality})
     onDateChange       = selectedDate       => this.setState({selectedDate})
     onAddressSelect = selectAddress => this.setState({selectAddress})
@@ -44,15 +31,15 @@ class SearchCore extends Component {
        try{ 
            const city = this.state.selectAddress.split(",");
            const search ={
-            speciality:this.state.selectedSpeciality,
+            specialty:this.state.selectedSpeciality,
             city:city[0],
             date:this.state.selectedDate        
         };
-        console.log(search);
+        //console.log(search);
         
         const result = await searchDoctors(search);
         if(result){
-            console.log(result);
+            //console.log(result);
             
         this.props.onSearch(result.data);
             }
@@ -62,20 +49,24 @@ class SearchCore extends Component {
     }
     render() {
         const { Option, OptGroup } = Select;
-        const {
-            title
+        let {
+            title,specialities
         } = this.props
-        const {
+     
+        let {
             speciality,
             popularSpeciality
         } = this.state
-        console.log("in search core",this.state);
+        specialities = Object.values(specialities);
+        speciality = specialities||[];
+        popularSpeciality = (specialities || []).filter( speciality => speciality.popular);
+      
         return (
             <div className="c-search-core">
                 <div className="">
                     <div className="row">
                         <div className="col-md-3">
-                        <Select
+                       <Select
                             suffixIcon={<Icon type="search" />}
                             showSearch
                             placeholder="Select Specialty"
@@ -95,7 +86,7 @@ class SearchCore extends Component {
                                         speciality.map((speciality, key) => <Option key={key} value={speciality.name}>{speciality.name}</Option>)
                                     }
                                 </OptGroup>
-                            </Select>
+                            </Select> 
                         </div>
                         <div className="col-md-3">
                             <AddressSearchInput className="ant-search-select" onSelect={this.onAddressSelect} />
@@ -120,7 +111,9 @@ class SearchCore extends Component {
         )
     }
 }
-
+SearchCore.propTypes={
+    specialities: propTypes.object.isRequired
+}
 SearchCore.defaultProps = {
     title: SEARCH_BOX_HEADING,
     
