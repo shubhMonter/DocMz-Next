@@ -31,13 +31,20 @@ class PaymentTest extends Component {
     displayRazorpay = async() =>{
 
         try {
-            const res = await this.loadScript("https://checkout.razorpay.com/v1/checkout.js"); 
+            const res = await this.loadScript("https://checkout.razorpay.com/v1/razorpay.js"); 
         if(!res){
             alert("failed to load script")
             return
         }
         const data = await getOrder();
         const {currency,amount,order_id} = data.data;
+        const card ={
+        name: 'Gaurav Kumar',
+        number: '4111111111111111',
+        cvv: '566',
+        expiry_month: '10',
+        expiry_year: '20'
+        };
     var options = {
         key: "rzp_test_fFhVXzu4VxWtSr", //use dev and production key 
         currency,
@@ -51,10 +58,23 @@ class PaymentTest extends Component {
             name: "Gaurav Kumar",
             email: "gaurav.kumar@example.com",
             contact: "9999999999"
-        }
+        },       
     };
+    console.log(options);
+    
     var razpay = new Razorpay(options);
-    razpay.open();
+    razpay.createPayment({ amount: 5000,
+        email: 'gaurav.kumar@example.com',
+        contact: '9123456780',
+        order_id,
+        method: 'netbanking',
+        bank: 'SBIN'});
+    razpay.on('payment.success', function(resp) {
+        alert(resp.razorpay_payment_id),
+        alert(resp.razorpay_order_id),
+        alert(resp.razorpay_signature)}); // will pass payment ID, order ID, and Razorpay signature to success handler.
+    
+      razpay.on('payment.error', function(resp){alert(resp.error.description)});
         } catch (err) {
             console.log("dispayRazorfunc err",err);
             
