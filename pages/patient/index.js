@@ -93,7 +93,7 @@ class patient extends Component {
 		console.log()
 		return (
 			<div>
-				<Layout className="layout">
+				<div className="maincontent-wrapper " >
 					{/* <Navbar /> */}
 
 					<Content
@@ -152,7 +152,7 @@ class patient extends Component {
 					<Footer style={{ textAlign: "center" }}>
 						Ant Design ©2018 Created by Ant UED
 					</Footer>
-				</Layout>
+				</div>
 				<Modal
 					title=""
 					visible={this.state.visible}

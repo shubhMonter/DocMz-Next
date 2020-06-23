@@ -190,7 +190,7 @@ class PaymentCard extends Component {
         number: cardNumber,
         exp_month: newDateArray && newDateArray[0] ? newDateArray[0] : 0,
         exp_year: newDateArray && newDateArray[1] ? newDateArray[1] : 0,
-        cvc: cardCV,
+        cvc: cardCV.split(" ").join(""),
         customer: userDetails.customerProfile,
         name: cardName
       };
@@ -242,7 +242,7 @@ class PaymentCard extends Component {
         number: cardNumber,
         exp_month: newDateArray && newDateArray[0] ? newDateArray[0] : 0,
         exp_year: newDateArray && newDateArray[1] ? newDateArray[1] : 0,
-        cvc: cardCV,
+        cvc: cardCV.split(" ").join(""),
         name: cardName
       };
 
@@ -297,7 +297,7 @@ class PaymentCard extends Component {
       cardNumber: this.state.cardNumber,
       cardName: this.state.cardName,
       cardDate: this.state.cardDate,
-      cardCV: this.state.cardCV
+      cardCV: this.state.cardCV.split(" ").join("")
     })
   }
   validateCard() {
@@ -530,7 +530,7 @@ class PaymentCard extends Component {
             {this.state.cvverrmsg}
           </div>
           {saveOptional && (
-
+ 
             <div className="custom-switch-ap-btn ">
               <label>Save this card</label>
               {/* <br/> */}
