@@ -1,92 +1,40 @@
-$color_one: #f8f9fb;
-$color_two: #fff;
-$color_three: #777777;
-$color_four: #3a3532d7;
-
-.patient_container {
-  border-radius: 3px;
-//   max-width: 1000px;
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: flex-start;
-  align-items: center;
-//   background-color: $color_two;
-  cursor: pointer;
-  margin: 50px;
+.dashboard-metrics-container {
+    background-color: $color-tertiary3;
+    border-radius: 2em;
+    .dashboard-datetime-wrapper {
+        padding: 0.7em 1em;
+        background: $color-primary2;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: $color-tertiary1;
+        border-radius: 1.2em;
+        .clock-icon {
+            align-items: center;
+            margin-right: 5px;
+            color: $color-primary1;
+            fill: $color-primary1;
+        }
+    }
+    //main wrapper
+    .dashboard-metrics-wrapper {
+        margin-top: 2.5em;
+        margin-left: 2.5em;
+        margin-right: 2.5em;
+    }
 }
 
-.patientCard {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.048),
-    0 6px 10px 0 rgba(0, 0, 0, 0.041);
-  display: flex;
-  flex-flow: column;
-  justify-content: center;
-  align-items: center;
-  width: 220px;
-  background-color: $color_two;
-  text-align: center;
-  padding: 20px 20px;
-  border-radius: 2px;
-  margin: 15px 10px;
-
-  &:hover {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.048),
-      0 6px 20px 0 rgba(0, 0, 0, 0.185);
-  }
-
-  h3,
-  h5,
-  h4 {
-    color: $color_four;
-    margin: 0px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    letter-spacing: 0.03em;
-    font-weight: 500;
-    font-size: 16px;
-
-    p {
-      font-weight: 400;
-      color: $color_three;
-      margin: 0px 3px;
-    }
-  }
-
-  h3 {
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  h4 {
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  h5 {
-    font-size: 12px;
-    font-weight: 800;
-    margin: 4px 0px;
-  }
-
-  p {
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  .details {
-    margin-top: 10px;
-    width: 100%;
-    div {
-      display: flex;
-      justify-content: space-between;
-      //   background-color: orange;
-    }
-  }
+.dashboard-secondary-title {
+    font-size: 1.3rem;
+    color: $color-tertiary1;
+    font-weight: 600;
 }
 
-.avater {
-  width: 100px;
-  height: 100px;
-  border-radius: 100px;
+@media only screen and (max-width: 600px) {
+    .dashboard-metrics-container {
+        border-radius: 0rem;
+        margin-bottom: 3rem;
+        .dashboard-datetime-wrapper {
+            display: none;
+        }
+    }
 }

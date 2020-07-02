@@ -2,7 +2,7 @@ import withBasicLayout from '../components/layouts/basic-layout/withBasicLayout'
 import SearchBar from '../components/search/search-bar/SearchBar'
 import SearchCard from '../components/search-card/SearchCard'
 import Loader from "../components/loader/Loader";
-import { getDoctorsList, searchDoctors } from '../services/api'
+import { getDoctorsList, searchDoctors,searchDoctorsLite } from '../services/api'
 import Moment from 'moment';
 import classNames from 'classnames';
 import { Affix } from 'antd';
@@ -42,6 +42,20 @@ class search extends React.Component {
                 });
             }).catch(err => console.log(err));
 
+
+        } else if(Router.router.query.hasOwnProperty("name")){
+
+            const search = {
+                match:"{}",
+                name:Router.router.query.name
+            };
+            searchDoctorsLite(search).then(res => {
+                console.log(res.data);
+
+                this.setState({
+                    doctors: [...res.data.data]
+                });
+            }).catch(err => console.log(err));
 
         } else {
 

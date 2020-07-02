@@ -2,17 +2,12 @@ import Head from 'next/head'
 import {compose} from "redux";
 import { connect } from 'react-redux'
 import Router from 'next/router'
-import Link from 'next/link'
 import { PROJECT_NAME, GOOGLE_API_KEY } from '../../../constants/projectKeys'
 import '../../../style/app.scss'
 import { getSpecialities, toggleDashboardCollapse } from '../../../redux/actions'
 import { Layout, Menu, Breadcrumb, Icon } from 'antd';
-import { Row, Col, Button, Card, Avatar, Spin, Tooltip, Popconfirm, message } from "antd";
-import { doctorDashboardMenu } from '../../../constants/messages/menus';
 import SideNav from '../../SideNav/SideNav';
-import TimelineDrover from '../../timeline/TimelineDrover';
-import LayoutDrawer from '../../layout-drawer/LayoutDrawer';
-import { getDoctorById } from '../../../services/api';
+import { getDoctorById,patientgetinfo } from '../../../services/api';
 
 
 const { Header: AntHeader, Content, Footer: AntFooter, Sider } = Layout;
@@ -51,8 +46,10 @@ const withDashboardLayout = (PassedComponent) => {
             };
         }
         componentDidMount(){
+            console.log(this.props);
             this.props.getSpecialities();
             const doctorId = this.props.loggedInDoctor._id;
+            const patientId = this.props.loggedInPatient._id;
             if(doctorId){
                 getDoctorById(doctorId)
                 .then(response => {
@@ -73,7 +70,29 @@ const withDashboardLayout = (PassedComponent) => {
                 .catch(e => {
                   console.log('error', e);
                 });
-            }else{
+            }
+            else if(patientId){
+               patientgetinfo(patientId)
+                .then(response => {
+                  console.log('patdetailsashbaord', response.data.data);
+          
+                  let apparr = response.data.data.appointments
+                  let filterapparr = apparr.filter(function (hero) {
+                    return hero.booked === true;
+                    // console.log('hero',hero.booked == true)
+                  });
+                  console.log('filterapparrrdata', apparr)
+                  this.setState({
+                    filterappointmentarr: filterapparr,
+                    allAppointments: apparr
+                  })
+                  console.log('allApp', this.state.filterappointmentarr)
+                })
+                .catch(e => {
+                  console.log('error', e);
+                });
+            }
+            else{
                 Router.push("/login")
             }
         }
@@ -109,12 +128,14 @@ const withDashboardLayout = (PassedComponent) => {
             if(!this.props.isPersist){
                 return <div />
             }
-            if(!this.props.loggedInDoctor._id){
+            if(!this.props.loggedInDoctor._id && !this.props.loggedInPatient._id){
                 return <div />
             }
             const {
                 visible, filterappointmentarr, allAppointments
             } = this.state
+            
+            
             return (
                 <div className="c-layout c-layout--dashboard">
                     <Head>

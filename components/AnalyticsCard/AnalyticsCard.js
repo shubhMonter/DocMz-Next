@@ -1,7 +1,7 @@
 import React from "react";
 import { Bar } from "react-chartjs-2";
 import { Card } from "react-bootstrap";
-import { ReactComponent as Bpm } from "../../assets/bpm.svg";
+import  Bpm  from "../assets/bpm";
 const AnalyticsCard = props => {
   return (
     <>

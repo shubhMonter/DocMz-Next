@@ -48,6 +48,7 @@ const withBasicLayout = PassedComponent => {
 			if (this.props.loggedInDoctor._id) {
 				Router.push("/doctor/newdash");
 			}
+			
 		}
 		componentDidUpdate(prevProps) {
 			if (prevProps.loggedInDoctor !== this.props.loggedInDoctor) {
@@ -55,6 +56,7 @@ const withBasicLayout = PassedComponent => {
 					Router.push("/doctor/newdash");
 				}
 			}
+			
 		}
 		render() {
 			const { children, ...props } = this.props;
@@ -105,7 +107,8 @@ withBasicLayout.protoTypes ={
 }
 const mapStateToProps = state => ({
 	specialities: state.specialities,
-	loggedInDoctor: state.loggedInDoctor
+	loggedInDoctor: state.loggedInDoctor,
+	loggedInPatient: state.loggedInPatient
 });
 const mapActionToProps = {
 	getSpecialities

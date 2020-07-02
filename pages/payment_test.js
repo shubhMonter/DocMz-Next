@@ -84,11 +84,11 @@ class PaymentTest extends Component {
             razpay.createPayment({
                 order_id,
                 amount,
-                email:'sv.dixit10@gmail.com',
-                contact:'8668515796',
+                customer_id:'cust_F4OYeJCkkRCfSz',
+               // email:'sv.dixit10@gmail.com',
+                //contact:'8668515796',
                 save: 1,
-                ...this.state.methods
-                
+                ...this.state.methods    
             });
             
             razpay.on('payment.success', function (resp) {
@@ -193,4 +193,4 @@ class PaymentTest extends Component {
 
 
 
-export default onlyGuest()(withBasicLayout(PaymentTest));
+export default withBasicLayout(PaymentTest);

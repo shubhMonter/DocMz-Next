@@ -7,7 +7,9 @@ import {
   Col,
   Steps,
   Divider,
+  Tabs
 } from "antd";
+const TabPane = Tabs.TabPane;
 import { connect } from 'react-redux'
 
 import AliceCarousel from 'react-alice-carousel'
@@ -15,6 +17,7 @@ import AliceCarousel from 'react-alice-carousel'
 import FormStep1 from "./FormStep1";
 import FormStep2 from "./FormStep2";
 import { patientCardList } from "../../services/api/patient";
+import { getOrder } from "../../services/api";
 import PaymentCard from "../../components/payment/PaymentCard";
 import AppointmentPayReview from "./AppointmentPayReview";
 import AppointmentDoctor from "./AppointmentDoctor";
@@ -64,6 +67,8 @@ function AppointmentForm({userDetails, ...formProps}) {
   const [secondStapForm, setSecondStapForm] = useState("");
   const [cardDetails, setCardDetails] = useState("");
   const [addCard, addCardToggle] = useState(false);
+  const [methods] = useState({});
+  const [upi] = useState('')
 
   useEffect(() => {
     getCardData(userDetails.customerProfile).then(({data}) => {
@@ -104,11 +109,6 @@ function AppointmentForm({userDetails, ...formProps}) {
       }
     });
   };
-
-  const onChange = (a, b, c) => {
-    console.log(a, b, c);
-  }
-
   const cardDetailsWithNextStep = data => {
     setCardDetails(data);
     setCurrentStep(2);
@@ -180,6 +180,74 @@ function AppointmentForm({userDetails, ...formProps}) {
   // );
   // const { Option } = Select
   // const { getFieldDecorator } = this.props.form;
+ const  loadScript = (src) => {
+    return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = src
+        script.onload = () => {
+            resolve(true)
+        }
+        script.onerror = () => {
+            resolve(false)
+        }
+        document.body.appendChild(script);
+    })
+
+}
+ const  onChange = (e)=> {
+   console.log(e);
+   
+    //this.setState({ [e.target.name]: e.target.value });
+  }
+ const onSubmit = () => {
+        
+    methods({
+        method:'upi',
+        upi:{
+            vpa:'',
+            flow:"collect"
+        }})
+    displayRazorpay();
+
+}
+const displayRazorpay = async () => {
+
+    try {
+      const res = await loadScript("https://checkout.razorpay.com/v1/razorpay.js");
+      if (!res) {
+        alert("failed to load script")
+        return
+    }
+      
+      const data = await getOrder();
+        const { currency, amount, order_id } = data.data;
+
+        let razpay = new Razorpay({ key: "rzp_test_fFhVXzu4VxWtSr" });
+        console.log(razpay);
+        
+        razpay.createPayment({
+            order_id,
+            amount,
+            customer_id:'cust_F4OYeJCkkRCfSz',
+           // email:'sv.dixit10@gmail.com',
+            //contact:'8668515796',
+            save: 1,
+            ...this.state.methods    
+        });
+        
+        razpay.on('payment.success', function (resp) {
+            alert(resp.razorpay_payment_id),
+                alert(resp.razorpay_order_id),
+                alert(resp.razorpay_signature)
+        }); // will pass payment ID, order ID, and Razorpay signature to success handler.
+
+           razpay.on('payment.error', function(resp){alert(resp.error.description)}); // will pass error object to error handler
+    } catch (err) {
+        console.log("dispayRazorfunc err", err);
+
+    }
+
+}
   return (
     <div className="c-appointment-form">
       <div className="c-appointment-form__header ap-appointment-form-custom">
@@ -276,113 +344,141 @@ function AppointmentForm({userDetails, ...formProps}) {
             <Col span={24}>
               <div className="c-appointment-form__steps">
                 <div className="c-appointment-form__step">
-                  <div className="">
-                    {addCard ? (
-                      <PaymentCard
-                        cvvOnCard={""}
-                        expDateOnCard={""}
-                        numberOnCard={""}
-                        nameOnCard={""}
-                        cardResponse={response => {
-                          console.log("response", { response });
-                        }}
-                        transactionData={e => {
-                          cardDetailsWithNextStep(e);
-                        }}
-                        saveOptional={true}
-                        backButton={() => {
-                          toggleCard();
-                        }}
-                      />
-                    ) : (
-                        <div className="custom-card-list-ap image_grid">
-
-{/*                
-                            <Radio.Group   
-                              name="type"
-                              style={{
-                                width: '100%'
-                              }}
-                              // onChange={(e) => {value = e.target.value }}
-                              // defaultValue={i}
-                              > */}
-                            <AliceCarousel mouseTrackingEnabled
-                              infinite={false}
-                              responsive={{
-                                0: {
-                                  items: 1,
-                              },
-                              1024: {
-                                  items: 2
-                              }
-                              }}
-                              // slideToIndex={slideIndex}
-                              // onSlideChanged={onSlideChanged}
-                              buttonsDisabled={true}
-                              dotsDisabled = {true}
-                              keysControlDisabled = {true}
-                            >
-                              
-                              {/* a{cards.length}a */}
-                              {
-                                cards.map((el, i) => (
-                                  
-                                    // <Radio key={i} value={i} 
-                                    // // onChange={() => 
-                                    // // setSavedCardData(el)
-                                    // // }
-                                    // >
-                                      <div
-                                      className="c-appointment-form__card-selector"
-                                      key={i}
-                                        // onClick={() => setSavedCardData(el)}
-                                        onDragStart={handleOnDragStart}
-                                        // className="image_grid"
-                                      >
-                                        <AppointmentShowCard
-                                          key={i}
-                                          cvvOnCard={''}
-                                          flip={false}
-                                          onClick={() => console.log('appointmentformcard')}
-
-                                          expDateOnCard={el.exp_month + '/' + el.exp_year}
-                                          numberOnCard={"xxxx xxxx xxxx " + el.last4}
-                                          nameOnCard={"shubham"}
-                                          transactionData=''
-
-                                        />
-                                        <br />
-                                        <Button onClick={()=> {
-                                          onCardSelect(el)
-                                        }} >Use This</Button>
-                                        <br />
-                                        <br />
-                                      </div>
-                                        // </Radio>
-                                ))
-                              }
-                            </AliceCarousel>
-                            {/* </Radio.Group> */}
-                          <Button
-                            className="c-appointment-form__card-tgl-btn"
-                            onClick={() => {
+                <Tabs defaultActiveKey="1">
+                    <TabPane tab="Card" key="1">
+                      <div className="">
+                        {addCard ? (
+                          <PaymentCard
+                            cvvOnCard={""} 
+                            expDateOnCard={""}
+                            numberOnCard={""}
+                            nameOnCard={""}
+                            cardResponse={response => {
+                              console.log("response", { response });
+                            }}
+                            transactionData={e => {
+                              cardDetailsWithNextStep(e);
+                            }}
+                            saveOptional={true}
+                            backButton={() => {
                               toggleCard();
                             }}
-                          >
-                            Add New <Icon type="plus" />
-                          </Button>
-                          {/* <Button
-                            style={{ float: 'right' }}
-                            type="primary"
-                            className="ap-appointment-details-btn"
-                            onClick={(e) => paymentslidersubmit(e)}
-                          >
-                            Next
-                          </Button> */}
-                        </div>
-                      )}
-                  </div>
-                </div>
+                          />
+                        ) : (
+                            <div className="custom-card-list-ap image_grid">
+
+    {/*                
+                                <Radio.Group   
+                                  name="type"
+                                  style={{
+                                    width: '100%'
+                                  }}
+                                  // onChange={(e) => {value = e.target.value }}
+                                  // defaultValue={i}
+                                  > */}
+                                <AliceCarousel mouseTrackingEnabled
+                                  infinite={false}
+                                  responsive={{
+                                    0: {
+                                      items: 1,
+                                  },
+                                  1024: {
+                                      items: 2
+                                  }
+                                  }}
+                                  // slideToIndex={slideIndex}
+                                  // onSlideChanged={onSlideChanged}
+                                  buttonsDisabled={true}
+                                  dotsDisabled = {true}
+                                  keysControlDisabled = {true}
+                                >
+                                  
+                                  {/* a{cards.length}a */}
+                                  {
+                                    cards.map((el, i) => (
+                                      
+                                        // <Radio key={i} value={i} 
+                                        // // onChange={() => 
+                                        // // setSavedCardData(el)
+                                        // // }
+                                        // >
+                                          <div
+                                          className="c-appointment-form__card-selector"
+                                          key={i}
+                                            // onClick={() => setSavedCardData(el)}
+                                            onDragStart={handleOnDragStart}
+                                            // className="image_grid"
+                                          >
+                                            <AppointmentShowCard
+                                              key={i}
+                                              cvvOnCard={''}
+                                              flip={false}
+                                              onClick={() => console.log('appointmentformcard')}
+
+                                              expDateOnCard={el.exp_month + '/' + el.exp_year}
+                                              numberOnCard={"xxxx xxxx xxxx " + el.last4}
+                                              nameOnCard={"shubham"}
+                                              transactionData=''
+
+                                            />
+                                            <br />
+                                            <Button onClick={()=> {
+                                              onCardSelect(el)
+                                            }} >Use This</Button>
+                                            <br />
+                                            <br />
+                                          </div>
+                                            // </Radio>
+                                    ))
+                                  }
+                                </AliceCarousel>
+                                {/* </Radio.Group> */}
+                              <Button
+                                className="c-appointment-form__card-tgl-btn"
+                                onClick={() => {
+                                  toggleCard();
+                                }}
+                              >
+                                Add New <Icon type="plus" />
+                              </Button>
+                              {/* <Button
+                                style={{ float: 'right' }}
+                                type="primary"
+                                className="ap-appointment-details-btn"
+                                onClick={(e) => paymentslidersubmit(e)}
+                              >
+                                Next
+                              </Button> */}
+                            </div>
+                          )}
+                      </div>
+                      </TabPane>
+                      <TabPane tab="UPI"  key="2">
+                                    <form className="payment-card-wrapper custom-payment-uppercard-ap-wrapper" >
+                                     
+                                        <div className="form-container-payment custom-ap-card-payment">
+                                        <div className="field-container">
+                                        <label for="upi">UPI ID</label>
+                                        <input
+                                        id="upiId"
+                                        maxlength="20"
+                                        type="text"
+                                        value={upi}
+                                        name="upi"
+                                        onChange={(e)=>{onChange(e)}}
+                                        />
+                                    </div>
+                                    </div>
+                                    <div className="field-container btn-container custom-ap-btn-containers-payment">
+                                    <Button className="submit-btn custom-ap-back-btn"
+                                    type="primary"  onClick={onSubmit()}>click to payment</Button>
+                                    </div>
+                                    </form>
+
+                                    </TabPane>
+                    </Tabs>
+                    </div>
+                    
               </div>
             </Col>
           </Row>

@@ -1,16 +1,21 @@
-import withBasicLayout from "../../components/layouts/basic-layout/withBasicLayout"
+import withDashboardLayout from "../../components/layouts/dashboard-layout/withDashboardLayout";
 import { connect } from "react-redux"
 import onlyGuest from "../../components/onlyGuest/onlyGuest"
 import React, { Component } from "react"
-import { Modal, Layout, Button, Divider } from "antd"
-import PaymentCard from "../../components/payment/PaymentCard"
-import ShowOnCard from "../../components/payment/ShowOnCard"
-// import Search from "../../../Home/Search";
-// import Navbar from "../../../Header/Header";
-import Sidebar from "../../components/patient-sidebar/Sidebar"
-// import Uppermsg from "../../Uppermsg";
+import { Container, Row, Col } from "react-bootstrap";
 import { patientCardList } from "../../services/api"
-const { Content, Footer } = Layout
+import  Search  from "../../components/assets/search";
+import  Cross  from "../../components/assets/redCross";
+import  Clocksvg  from "../../components/assets/clock";
+import ProfileInfo from "../../components/ProfileInfo/ProfileInfo";
+import HealthDetail from "../../components/HealthDetail/HealthDetail";
+import UpcomingCards from "../../components/upcomingCards/UpcomingCards";
+import AnalyticsCard from "../../components/AnalyticsCard/AnalyticsCard";
+import DiscountsCard from "../../components/DiscountsCard/DiscountsCard";
+import Graphs from "../../components/Graphs/Graphs";
+import Calendar from "../../components/CalendarSlider/Calendar";
+import Clock from "react-live-clock";
+import Router from "next/router"
 class patient extends Component {
 	constructor(props) {
 		super(props)
@@ -23,23 +28,24 @@ class patient extends Component {
 				cvvNo: "1234"
 			},
 			cardList: [],
-			// userDetails: JSON.parse(localStorage.getItem("patient")),
-			modalToggle: false
+			// loggedInPatient: JSON.parse(localStorage.getItem("patient")),
+			modalToggle: false,
+			search:''
 		}
 	}
 	componentDidMount() {
 		this.getSaveCards()
 	}
 	getSaveCards() {
-		const { userDetails } = this.props
-		// if(!userDetails){
+		const { loggedInPatient } = this.props
+		// if(!loggedInPatient){
 		//   this.props.history.push("/login")
 		//   return
 		// }
 		console.log({
-			userDetails
+			loggedInPatient
 		})
-		patientCardList(userDetails?.customerProfile)
+		patientCardList(loggedInPatient?.customerProfile)
 			.then(res => {
 				const { data } = res.data.data
 				console.log({ data })
@@ -88,97 +94,99 @@ class patient extends Component {
 	cardResponse = response => {
 		console.log({ response })
 	}
+	onchange = (e) =>{
+		console.log(e.target.value);
+		this.setState({search:e.target.value});
+	}
+	onsubmit = (e) =>{
+		e.preventDefault();
+		Router.push(`/search?name=${this.state.search}`)
+	}
 	render() {
 		const { cardDetails, cardList } = this.state
-		console.log()
+		const {email} = this.props.loggedInPatient;
+		console.log(this.props)
 		return (
-			<div>
+			
 				<div className="maincontent-wrapper " >
 					{/* <Navbar /> */}
+					<section className="dashboard-info-section">
+							<Container fluid>
+							<Row>
+								<Col sm={8} className="p-0 dashboard-metrics-container">
+								{/* search wrapper style classes reused from dashboard page styles file */}
+								{/* search and time section starts here  */}
+								<section className="searchbar-wrapper">
+									<div className="searchbar-container">
+									<Search />
 
-					<Content
-						style={{ padding: "0 50px", marginTop: 64 }}
-						className="custom-home-content-ap"
-					>
-						<div
-							style={{ background: "transparent", padding: 24, minHeight: 380 }}
-							className="doctor-header"
-						>
-							{/* <Uppermsg /> */}
-							<header className="App-header">{/* <Search /> */}</header>
-							<Content style={{ padding: "0", marginTop: "30px" }}>
-								<Layout
-									style={{
-										padding: "24px 0"
-										//  background: '#fff'
-									}}
-								>
-									<Sidebar active={"6"} />
-									<Content
-										style={{ minHeight: 280 }}
-										className="custom-home-content-inner-ap-patient"
-									>
-										<Layout>
-											<Content className="patient-profile-content">
-												<p className="profile-header-custom-patient-ap">
-													<strong>Payment</strong>
-												</p>
-												<Divider />
-												<Button onClick={() => this.showModal()}>
-													Add Card
-												</Button>
-												<div className="patient-profile-card">
-													{cardList && cardList.length > 0
-														? cardList.map((item, index) => (
-																<ShowOnCard
-																	cvvOnCard={""}
-																	expDateOnCard={
-																		item.exp_month + "/" + item.exp_year
-																	}
-																	numberOnCard={"xxxx xxxx xxxx " + item.last4}
-																	nameOnCard={item.name}
-																	transactionData=""
-																/>
-														  ))
-														: "No card."}
-												</div>
-											</Content>
-										</Layout>
-									</Content>
-								</Layout>
-							</Content>
-						</div>
-					</Content>
-					<Footer style={{ textAlign: "center" }}>
-						Ant Design ©2018 Created by Ant UED
-					</Footer>
-				</div>
-				<Modal
-					title=""
-					visible={this.state.visible}
-					onOk={this.showModal}
-					onCancel={this.showModal}
-					footer={null}
-					width={"80%"}
-				>
-					<PaymentCard
-						cvvOnCard={""}
-						expDateOnCard={""}
-						numberOnCard={""}
-						nameOnCard={""}
-						cardResponse={response => this.cardResponse(response)}
-						backButton={() => this.showModal()}
-						transactionData={() => {}}
-					/>
-				</Modal>
-			</div>
+									<div className="searchbar-input ">
+									<form onSubmit={this.onsubmit.bind(this)}>
+									<input
+										type="text"
+										placeholder="Search for symptoms.."
+										onChange={this.onchange.bind(this)}
+										/>
+										
+										</form>	
+									</div>
+									</div>
+									{/*  brand logo for mobile deivces visible only on mobile deivices  */}
+									<div className="brand-sm-wrapper">
+									<div className="brand-sm-icon">
+										<Cross />
+									</div>
+									<div className="brand-sm-info">Medi</div>
+									</div>
+									{/* //ends here */}
+									<div className="dashboard-datetime-wrapper">
+									<span className="clock-icon">
+										<Clocksvg />
+									</span>
+									<Clock
+										format={"h:mm:ss A,dddd, MMMM Mo, YYYY"}
+										ticking={true}
+									/>{" "}
+									</div>
+								</section>
+								{/* Search section ends here  */}
+								{/* Dashboard page metrics  wrapper starts here */}
+								<section className="dashboard-metrics-wrapper">
+									<DiscountsCard />
+									<Graphs />
+									<div className="d-flex justify-content-between">
+									<AnalyticsCard name="analytics" />
+									<AnalyticsCard />
+									</div>
+								</section>
+								{/* Dashboard page metrics  wrapper ends here */}
+								</Col>
+								<Col sm={4} className="dashboard-info-container px-5">
+								<ProfileInfo name={email}/>
+								<HealthDetail />
+
+								<Calendar />
+
+								<UpcomingCards type={"dent"} />
+								<UpcomingCards />
+								<div className="dashboard-secondary-title mt-4 mb-2 mx-5 px-2">
+									Your treatment
+								</div>
+								<UpcomingCards type={"drug"} />
+								<UpcomingCards type={"vitamin"} />
+								</Col>
+							</Row>
+							</Container>
+						</section>
+					</div>
+		
 		)
 	}
 }
 const mapStateToProps = state => ({
-	userDetails: state.loggedInPatient
+	loggedInPatient: state.loggedInPatient
 })
 
 export default onlyGuest(false)(
-	withBasicLayout(connect(mapStateToProps)(patient))
+	withDashboardLayout(connect(mapStateToProps)(patient))
 )

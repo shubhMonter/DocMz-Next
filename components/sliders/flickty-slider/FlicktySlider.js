@@ -8,7 +8,7 @@ const FlicktySlider = ({children}) => {
             if(flkty){
                 flkty.on("scroll", progress => {
                     if(!isNaN(progress)){
-                        let pos = `${progress * .70}%`;
+                        let pos = `${progress * .90}%`;
                         sliderLine.current.style.left = pos
                     }
                 });
@@ -33,7 +33,8 @@ const FlicktySlider = ({children}) => {
                 flickityRef={c => (flkty = c)}
                 disableImagesLoaded={false}
                 reloadOnUpdate={true}
-                className="c-flickty__slider"
+                className="c-flickty__slider cards"
+                
             >
                 {children}
             </Flickity>

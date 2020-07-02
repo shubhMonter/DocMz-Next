@@ -7,6 +7,7 @@ const getDoctorByNpi = `${BASE_URL}/doctors/getinfo`
 const doctorProfileUpdate = `${BASE_URL}/doctors/profile/update`
 const saveTimeSlots = `${BASE_URL}/doctors/saveslots`
 const searchDoctors = `${BASE_URL}/doctors/search`
+const searchDoctorsLite = `${BASE_URL}/doctors/searchlite`
 
 const registerDoctor = `${BASE_URL}/doctors/register`
 const doctorLogin = `${BASE_URL}/doctors/authenticate`
@@ -17,6 +18,7 @@ const patientCardSave = `${BASE_URL}/stripe/create/card/profile`
 const patientCardStripeCharge = `${BASE_URL}/stripe/charge/card`
 const patientCardTestDetails = `${BASE_URL}/stripe/testcard`
 const patientCardList = `${BASE_URL}/stripe/list`
+const patientgetinfo = `${BASE_URL}/patient/getinfo`
 
 const getAppointments = `${BASE_URL}/appointment/get`
 const approveAppointments = `${BASE_URL}/appointment/approve`
@@ -33,6 +35,7 @@ export default {
     doctorProfileUpdate,
     saveTimeSlots,
     searchDoctors,
+    searchDoctorsLite,
 
     registerPatient,
     patientLogin,
@@ -40,6 +43,7 @@ export default {
     patientCardStripeCharge,
     patientCardTestDetails,
     patientCardList,
+    patientgetinfo,
 
     getAppointments,
     approveAppointments,

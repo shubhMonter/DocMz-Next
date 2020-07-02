@@ -1,5 +1,5 @@
 import React from "react";
-import { ReactComponent as Lungsvec } from "../../assets/lungs_vec.svg";
+import  Lungsvec  from "../assets/lungs_vec";
 const DiscountsCard = () => {
   return (
     <>

@@ -10,6 +10,7 @@ export const doctorLogin = body => Axios.post(apiList.doctorLogin, body)
 export const doctorProfileUpdate = body => Axios.post(apiList.doctorProfileUpdate, body)
 export const saveTimeSlots = body => Axios.post(apiList.saveTimeSlots, body)
 export const searchDoctors = body => Axios.post(apiList.searchDoctors, body)
+export const searchDoctorsLite = body => Axios.post(apiList.searchDoctorsLite, body)
 
 export const getAppointments = ({ limit, doctor, date }) => Axios.post(apiList.getAppointments, { limit, doctor, date })
 export const approveAppointments = body => Axios.post(apiList.approveAppointments, body)

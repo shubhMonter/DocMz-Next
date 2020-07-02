@@ -23,7 +23,7 @@ const onlyGuest = (isGuest = true) => (PassedComponent) => connect(mapStateToPro
     componentDidMount(){
         if(isGuest){
             if(this.props.isPersist && this.props.loggedInPatient._id){
-                Router.push("/")
+                Router.push("/patient")
             }
         }else{
             if(this.props.isPersist && !this.props.loggedInPatient._id){
@@ -35,7 +35,7 @@ const onlyGuest = (isGuest = true) => (PassedComponent) => connect(mapStateToPro
         if((prevProps.loggedInPatient !== this.props.loggedInPatient) || (prevProps.isPersist !== this.props.isPersist)){
             if(isGuest){
                 if(this.props.isPersist && this.props.loggedInPatient._id){
-                    Router.push("/")
+                    Router.push("/patient")
                 }
             }else{
                 if(this.props.isPersist && !this.props.loggedInPatient._id){

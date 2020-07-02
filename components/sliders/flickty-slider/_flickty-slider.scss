@@ -8,6 +8,17 @@
             outline: none;
         }
     }
+    .cards {
+        .flickity-viewport {
+            height: 200px!important;
+        }
+        .flickity-prev-next-button.previous {
+            left: 38px!important;
+        }
+        .flickity-slider {
+            left: 40px!important;
+        }
+    }
     .flickity-button {
         background: transparent;
         padding: 10px;
@@ -40,18 +51,6 @@
     }
 }
 
-.flickity-slider {
-    left: 40px!important;
-}
-
-.flickity-viewport {
-    height: 235px!important;
-}
-
-.flickity-prev-next-button.previous {
-    left: 38px!important;
-}
-
 .c-flickty .flickity-button:hover svg {
     fill: #ffffff!important;
 }
@@ -62,8 +61,4 @@
 
 .c-flickty .flickity-button:hover {
     color: #5b72f2!important;
-}
-
-.flickity-prev-next-button.next {
-    right: -80%!important;
 }
