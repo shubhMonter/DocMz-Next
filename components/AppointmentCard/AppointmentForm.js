@@ -17,10 +17,11 @@ import AliceCarousel from 'react-alice-carousel'
 import FormStep1 from "./FormStep1";
 import FormStep2 from "./FormStep2";
 import { patientCardList } from "../../services/api/patient";
-import { getOrder } from "../../services/api";
+import { getOrder,addPayment } from "../../services/api";
 import PaymentCard from "../../components/payment/PaymentCard";
 import AppointmentPayReview from "./AppointmentPayReview";
 import AppointmentDoctor from "./AppointmentDoctor";
+import Questionaire from "./Questionaire"; 
 import './newappointmentap.scss'
 import AppointmentShowCard from "./AppointmentShowCard";
 const stepStyle = {
@@ -33,14 +34,14 @@ const getCardData = async (customerProfile) => {
   const cards = await res.data?.data
 
   return cards
-    // .then(res => {
-    //   console.log('patient', res)
-    //   const { data } = res.data.data;
-    //   cards = data;
-    // })
-    // .catch(err => {
-    //   console.log({ err });
-    // });
+  // .then(res => {
+  //   console.log('patient', res)
+  //   const { data } = res.data.data;
+  //   cards = data;
+  // })
+  // .catch(err => {
+  //   console.log({ err });
+  // });
 };
 
 function onRadioChange(e) {
@@ -49,16 +50,18 @@ function onRadioChange(e) {
 
 // class AppointmentForm extends React.Component{ 
 //   render () {
-function AppointmentForm({userDetails, ...formProps}) {
+function AppointmentForm({ userDetails, ...formProps }) {
   const FormOne = Form.create({ name: "appointment_form_one" })(FormStep1);
   const FormTwo = Form.create({ name: "appointment_form_two" })(FormStep2);
-  const FormThree = Form.create({ name: "appointment_form_three" })(
+  const FormThree = Form.create({ name: "appointment_form_three" })(Questionaire);
+  const FormFour = Form.create({ name: "appointment_form_four" })(
     AppointmentPayReview
   );
   let formOne = React.createRef();
   let formTwo = React.createRef();
   let carousel = React.createRef();
-  
+  let questionaire = React.createRef();
+
   const [cards, setCards] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [value, setValue] = useState("");
@@ -67,11 +70,13 @@ function AppointmentForm({userDetails, ...formProps}) {
   const [secondStapForm, setSecondStapForm] = useState("");
   const [cardDetails, setCardDetails] = useState("");
   const [addCard, addCardToggle] = useState(false);
-  const [methods] = useState({});
-  const [upi] = useState('')
+  const [method, setMethods] = useState("");
+  const [upi, setUpi] = useState("");
+  const [card,setCard] = useState({});
+  
 
   useEffect(() => {
-    getCardData(userDetails.customerProfile).then(({data}) => {
+    getCardData(userDetails.customerProfile).then(({ data }) => {
       setCards(data)
     })
   }, cards)
@@ -160,16 +165,16 @@ function AppointmentForm({userDetails, ...formProps}) {
     height: '30px',
     lineHeight: '30px',
   };
-  
- 
+
+
   const slideTo = (i) => setSlideIndex(i)
- 
+
   const onSlideChanged = (e) => setSlideIndex(e.item)
- 
+
   const slideNext = () => setSlideIndex(slideIndex + 1)
- 
+
   const slidePrev = () => setSlideIndex(slideIndex - 1)
- console.log({slideIndex})
+
   // const prefixSelector = getFieldDecorator('prefix', {
   //   initialValue: '86',
   // })(
@@ -180,74 +185,93 @@ function AppointmentForm({userDetails, ...formProps}) {
   // );
   // const { Option } = Select
   // const { getFieldDecorator } = this.props.form;
- const  loadScript = (src) => {
+  const loadScript = (src) => {
     return new Promise((resolve) => {
-        const script = document.createElement('script');
-        script.src = src
-        script.onload = () => {
-            resolve(true)
-        }
-        script.onerror = () => {
-            resolve(false)
-        }
-        document.body.appendChild(script);
+      const script = document.createElement('script');
+      script.src = src
+      script.onload = () => {
+        resolve(true)
+      }
+      script.onerror = () => {
+        resolve(false)
+      }
+      document.body.appendChild(script);
     })
 
-}
- const  onChange = (e)=> {
-   console.log(e);
-   
-    //this.setState({ [e.target.name]: e.target.value });
   }
- const onSubmit = () => {
-        
-    methods({
-        method:'upi',
-        upi:{
-            vpa:'',
-            flow:"collect"
-        }})
-    displayRazorpay();
 
-}
-const displayRazorpay = async () => {
+  const onSubmit = (e) => {
+    e.preventDefault();
+    displayRazorpay();
+  }
+  const displayRazorpay = async () => {
 
     try {
       const res = await loadScript("https://checkout.razorpay.com/v1/razorpay.js");
       if (!res) {
         alert("failed to load script")
         return
-    }
-      
+      }
+
       const data = await getOrder();
-        const { currency, amount, order_id } = data.data;
+      const { currency, amount, order_id } = data.data;
 
-        let razpay = new Razorpay({ key: "rzp_test_fFhVXzu4VxWtSr" });
-        console.log(razpay);
-        
-        razpay.createPayment({
-            order_id,
-            amount,
-            customer_id:'cust_F4OYeJCkkRCfSz',
-           // email:'sv.dixit10@gmail.com',
-            //contact:'8668515796',
-            save: 1,
-            ...this.state.methods    
-        });
-        
-        razpay.on('payment.success', function (resp) {
-            alert(resp.razorpay_payment_id),
-                alert(resp.razorpay_order_id),
-                alert(resp.razorpay_signature)
-        }); // will pass payment ID, order ID, and Razorpay signature to success handler.
+      let razpay = new Razorpay({ key: "rzp_test_fFhVXzu4VxWtSr" });
+      
+      let option;
 
-           razpay.on('payment.error', function(resp){alert(resp.error.description)}); // will pass error object to error handler
+      if(method==="card"){
+        option={
+          order_id,
+          amount,
+          customer_id: 'cust_F4OYeJCkkRCfSz',
+          email: 'sv.dixit10@gmail.com',
+          contact: '8668515796',
+          save: 1,
+          method:method,
+          card
+        }
+      }else if(method==="upi"){
+        option={
+          order_id,
+          amount,
+          customer_id: 'cust_F4OYeJCkkRCfSz',
+          email: 'sv.dixit10@gmail.com',
+          contact: '8668515796',
+          save: 1,
+          method:method,
+          upi:{
+            vpa:upi,
+            flow:"collect"
+          }
+        }
+      }
+
+      razpay.createPayment(option);
+
+      razpay.on('payment.success', async function (resp) {
+       
+         let pay=  await addPayment({
+            doctor:formProps.doctor._id,
+            patient:userDetails._id,
+            transactionId:resp.razorpay_payment_id,
+            amount
+          });
+          console.log(pay);
+          
+          
+          setCurrentStep(3);
+         // alert(resp.razorpay_order_id),
+         // alert(resp.razorpay_signature)
+      }); // will pass payment ID, order ID, and Razorpay signature to success handler.
+
+      razpay.on('payment.error', function (resp) { alert(resp.error.description) }); // will pass error object to error handler
     } catch (err) {
-        console.log("dispayRazorfunc err", err);
+      console.log("dispayRazorfunc err", err);
 
     }
 
-}
+  }
   return (
     <div className="c-appointment-form">
       <div className="c-appointment-form__header ap-appointment-form-custom">
@@ -272,6 +296,10 @@ const displayRazorpay = async () => {
           />
           <Step
             // status={currentStep < 4 ? "finish" : "process"}
+          title="Questionaire"
+          />
+          <Step
+            // status={currentStep < 5 ? "finish" : "process"}
             title="Review and Pay"
           />
 
@@ -344,17 +372,138 @@ const displayRazorpay = async () => {
             <Col span={24}>
               <div className="c-appointment-form__steps">
                 <div className="c-appointment-form__step">
-                <Tabs defaultActiveKey="1">
-                    <TabPane tab="Card" key="1">
-                      <div className="">
-                        {addCard ? (
+                  <Tabs defaultActiveKey="1" tabPosition="left">
+                    <TabPane tab="Stripe Payment" key="1">
+                      <Tabs defaultActiveKey="1">
+                        <TabPane tab="Card" key="1">
+                          <div className="">
+                            {addCard ? (
+                              <PaymentCard
+                                cvvOnCard={""}
+                                expDateOnCard={""}
+                                numberOnCard={""}
+                                nameOnCard={""}
+                                cardResponse={response => {
+                                  console.log("response", { response });
+                                }}
+                                transactionData={e => {
+                                  cardDetailsWithNextStep(e);
+                                }}
+                                saveOptional={true}
+                                backButton={() => {
+                                  toggleCard();
+                                }}
+                              />
+                            ) : (
+                                <div className="custom-card-list-ap image_grid">
+
+                                  {/*                
+                                    <Radio.Group   
+                                      name="type"
+                                      style={{
+                                        width: '100%'
+                                      }}
+                                      // onChange={(e) => {value = e.target.value }}
+                                      // defaultValue={i}
+                                      > */}
+                                  <AliceCarousel mouseTrackingEnabled
+                                    infinite={false}
+                                    responsive={{
+                                      0: {
+                                        items: 1,
+                                      },
+                                      1024: {
+                                        items: 2
+                                      }
+                                    }}
+                                    // slideToIndex={slideIndex}
+                                    // onSlideChanged={onSlideChanged}
+                                    buttonsDisabled={true}
+                                    dotsDisabled={true}
+                                    keysControlDisabled={true}
+                                  >
+
+                                    {/* a{cards.length}a */}
+                                    {
+                                      cards.map((el, i) => (
+
+                                        // <Radio key={i} value={i} 
+                                        // // onChange={() => 
+                                        // // setSavedCardData(el)
+                                        // // }
+                                        // >
+                                        <div
+                                          className="c-appointment-form__card-selector"
+                                          key={i}
+                                          // onClick={() => setSavedCardData(el)}
+                                          onDragStart={handleOnDragStart}
+                                        // className="image_grid"
+                                        >
+                                          <AppointmentShowCard
+                                            key={i}
+                                            cvvOnCard={''}
+                                            flip={false}
+                                            onClick={() => console.log('appointmentformcard')}
+
+                                            expDateOnCard={el.exp_month + '/' + el.exp_year}
+                                            numberOnCard={"xxxx xxxx xxxx " + el.last4}
+                                            nameOnCard={"shubham"}
+                                            transactionData=''
+
+                                          />
+                                          <br />
+                                          <Button onClick={() => {
+                                            onCardSelect(el)
+                                          }} >Use This</Button>
+                                          <br />
+                                          <br />
+                                        </div>
+                                        // </Radio>
+                                      ))
+                                    }
+                                  </AliceCarousel>
+                                  {/* </Radio.Group> */}
+                                  <Button
+                                    className="c-appointment-form__card-tgl-btn"
+                                    onClick={() => {
+                                      toggleCard();
+                                    }}
+                                  >
+                                    Add New <Icon type="plus" />
+                                  </Button>
+                                  {/* <Button
+                                    style={{ float: 'right' }}
+                                    type="primary"
+                                    className="ap-appointment-details-btn"
+                                    onClick={(e) => paymentslidersubmit(e)}
+                                  >
+                                    Next
+                                  </Button> */}
+                                </div>
+                              )}
+                          </div>
+                        </TabPane>
+
+                      </Tabs>
+                    </TabPane>
+                    <TabPane tab="RazorPay Payment" key="2">
+                      <Tabs defaultActiveKey="1">
+                        <TabPane tab="Card" key="1">
                           <PaymentCard
-                            cvvOnCard={""} 
+                            cvvOnCard={""}
                             expDateOnCard={""}
                             numberOnCard={""}
                             nameOnCard={""}
                             cardResponse={response => {
-                              console.log("response", { response });
+                              setMethods("card");
+                              setCard({
+                                cvv:response.cardCV,
+                                name:response.cardName,
+                                number:response.cardNumber,
+                                expiry_month:response.cardDate.split("/")[0],
+                                expiry_year:response.cardDate.split("/")[1]
+                              })
+                              displayRazorpay();
                             }}
                             transactionData={e => {
                               cardDetailsWithNextStep(e);
@@ -364,129 +513,61 @@ const displayRazorpay = async () => {
                               toggleCard();
                             }}
                           />
-                        ) : (
-                            <div className="custom-card-list-ap image_grid">
 
-    {/*                
-                                <Radio.Group   
-                                  name="type"
-                                  style={{
-                                    width: '100%'
-                                  }}
-                                  // onChange={(e) => {value = e.target.value }}
-                                  // defaultValue={i}
-                                  > */}
-                                <AliceCarousel mouseTrackingEnabled
-                                  infinite={false}
-                                  responsive={{
-                                    0: {
-                                      items: 1,
-                                  },
-                                  1024: {
-                                      items: 2
-                                  }
-                                  }}
-                                  // slideToIndex={slideIndex}
-                                  // onSlideChanged={onSlideChanged}
-                                  buttonsDisabled={true}
-                                  dotsDisabled = {true}
-                                  keysControlDisabled = {true}
-                                >
-                                  
-                                  {/* a{cards.length}a */}
-                                  {
-                                    cards.map((el, i) => (
-                                      
-                                        // <Radio key={i} value={i} 
-                                        // // onChange={() => 
-                                        // // setSavedCardData(el)
-                                        // // }
-                                        // >
-                                          <div
-                                          className="c-appointment-form__card-selector"
-                                          key={i}
-                                            // onClick={() => setSavedCardData(el)}
-                                            onDragStart={handleOnDragStart}
-                                            // className="image_grid"
-                                          >
-                                            <AppointmentShowCard
-                                              key={i}
-                                              cvvOnCard={''}
-                                              flip={false}
-                                              onClick={() => console.log('appointmentformcard')}
 
-                                              expDateOnCard={el.exp_month + '/' + el.exp_year}
-                                              numberOnCard={"xxxx xxxx xxxx " + el.last4}
-                                              nameOnCard={"shubham"}
-                                              transactionData=''
 
-                                            />
-                                            <br />
-                                            <Button onClick={()=> {
-                                              onCardSelect(el)
-                                            }} >Use This</Button>
-                                            <br />
-                                            <br />
-                                          </div>
-                                            // </Radio>
-                                    ))
-                                  }
-                                </AliceCarousel>
-                                {/* </Radio.Group> */}
-                              <Button
-                                className="c-appointment-form__card-tgl-btn"
-                                onClick={() => {
-                                  toggleCard();
-                                }}
-                              >
-                                Add New <Icon type="plus" />
-                              </Button>
-                              {/* <Button
-                                style={{ float: 'right' }}
-                                type="primary"
-                                className="ap-appointment-details-btn"
-                                onClick={(e) => paymentslidersubmit(e)}
-                              >
-                                Next
-                              </Button> */}
+                        </TabPane>
+                        <TabPane tab="UPI" key="2">
+                          <form className="payment-card-wrapper custom-payment-uppercard-ap-wrapper" style={{ display: "block" }}>
+
+                            <div className="form-container-payment custom-ap-card-payment">
+                              <div className="field-container">
+                                <label for="upi">UPI ID</label>
+                                <input
+                                  id="upiId"
+                                  maxlength="20"
+                                  type="text"
+                                  value={upi}
+                                  name="upi"
+                                  onChange={(e) => 
+                                              { 
+                                              setMethods("upi");
+                                              setUpi(e.target.value);
+                                              }
+                                            }
+
+                                />
+                              </div>
                             </div>
-                          )}
-                      </div>
-                      </TabPane>
-                      <TabPane tab="UPI"  key="2">
-                                    <form className="payment-card-wrapper custom-payment-uppercard-ap-wrapper" >
-                                     
-                                        <div className="form-container-payment custom-ap-card-payment">
-                                        <div className="field-container">
-                                        <label for="upi">UPI ID</label>
-                                        <input
-                                        id="upiId"
-                                        maxlength="20"
-                                        type="text"
-                                        value={upi}
-                                        name="upi"
-                                        onChange={(e)=>{onChange(e)}}
-                                        />
-                                    </div>
-                                    </div>
-                                    <div className="field-container btn-container custom-ap-btn-containers-payment">
-                                    <Button className="submit-btn custom-ap-back-btn"
-                                    type="primary"  onClick={onSubmit()}>click to payment</Button>
-                                    </div>
-                                    </form>
+                            <div className="field-container btn-container custom-ap-btn-containers-payment">
+                              <Button className="submit-btn custom-ap-back-btn"
+                                onClick={onSubmit}>click to payment</Button>
+                            </div>
+                          </form>
 
-                                    </TabPane>
-                    </Tabs>
-                    </div>
-                    
+                        </TabPane>
+                      </Tabs>
+                    </TabPane>
+                  </Tabs>
+
+
+                </div>
+
               </div>
             </Col>
           </Row>
         </div>
       )
       }
+      {currentStep === 3 &&(
+        <div className="d-flex flex-column align-items-start flex-grow-1">
+          <Questionaire />
+        </div>
+      )
+
+      }
       {
-        currentStep === 3 && (
+        currentStep === 4 && (
           <div className="d-flex flex-grow-1">
 
             <Row type="flex" className="w-100">

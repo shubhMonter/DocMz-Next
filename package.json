@@ -16,6 +16,7 @@
 		"@zeit/next-sass": "^1.0.1",
 		"animate.css": "^3.7.2",
 		"antd": "^3.26.9",
+		"antd-form-generator": "0.0.49",
 		"axios": "^0.19.2",
 		"bootstrap": "^4.4.1",
 		"breakpoint-sass": "^2.7.1",

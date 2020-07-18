@@ -9,7 +9,7 @@ import Mail  from "../assets/mail";
 import Exit  from "../assets/exit";
 import Link from 'next/link';
 import Router from "next/router"
-import { unsetLoggedInDoctor } from '../../redux/actions'
+import { unsetLoggedInDoctor ,unsetLoggedInPatient} from '../../redux/actions'
 import { Button } from "antd";
 
 
@@ -23,6 +23,8 @@ class SideNav extends Component{
     }
    logout(){
     this.props.unsetLoggedInDoctor();
+    this.props.unsetLoggedInPatient();
+
   }
   render(){
     return (
@@ -90,6 +92,7 @@ class SideNav extends Component{
 };
 
 const mapDispatchToProps = {
-  unsetLoggedInDoctor
+  unsetLoggedInDoctor,
+  unsetLoggedInPatient
 }
 export default connect(null, mapDispatchToProps)(SideNav)

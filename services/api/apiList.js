@@ -19,9 +19,10 @@ const patientCardStripeCharge = `${BASE_URL}/stripe/charge/card`
 const patientCardTestDetails = `${BASE_URL}/stripe/testcard`
 const patientCardList = `${BASE_URL}/stripe/list`
 const patientgetinfo = `${BASE_URL}/patient/getinfo`
-
+const getQuesById =`${BASE_URL}/Questionnaire/get`
 const getAppointments = `${BASE_URL}/appointment/get`
 const approveAppointments = `${BASE_URL}/appointment/approve`
+const addPayment = `${BASE_URL}/payment/add`
 
 const getOrder = `${BASE_URL}/razorpay/createorder`
 
@@ -44,10 +45,10 @@ export default {
     patientCardTestDetails,
     patientCardList,
     patientgetinfo,
-
+    getQuesById,
     getAppointments,
     approveAppointments,
-
+    addPayment,
     getOrder
 
 }

@@ -26,13 +26,10 @@ class PaymentTest extends Component {
    async componentDidMount(){
        try {
         const res = await this.loadScript("https://checkout.razorpay.com/v1/razorpay.js");
-
         if (!res) {
             alert("failed to load script")
             return
         }
-       
-   
           
        } catch (err) {
            console.log(err);

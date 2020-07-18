@@ -58,12 +58,10 @@ class search extends React.Component {
             }).catch(err => console.log(err));
 
         } else {
-
-
             getDoctorsList()
                 .then(res => {
                     this.setState({
-                        doctors: [...res.data.data].filter(doctor => doctor.appointments && doctor.appointments.length > 0)
+                        doctors: [...res.data].filter(doctor => doctor.appointments && doctor.appointments.length > 0)
                     });
                     if (this.state.doctors) {
                         this.setState({ isLoading: false });
