@@ -9,3 +9,7 @@ export const patientCardTestDetails = body => Axios.post(apiList.patientCardTest
 export const getQuesById = body => Axios.post(apiList.getQuesById, body)
 export const patientCardList = id => Axios.get(apiList.patientCardList + `/${id}`)
 export const patientgetinfo =id=> Axios.get(apiList.patientgetinfo + `/${id}`)
+export const uploadimagepatient = files => Axios.post(apiList.UploadImagePatient,files,{
+    headers: {
+     'content-type': 'multipart/form-data' // do not forget this 
+    }})

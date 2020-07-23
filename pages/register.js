@@ -44,6 +44,7 @@ class register extends Component {
     
     render() {
         const { current, infoForm } = this.state;
+        console.log(current);
         const steps = [
             {
                 title: "Join For a Good Start",

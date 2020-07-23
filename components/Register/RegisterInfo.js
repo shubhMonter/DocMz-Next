@@ -23,8 +23,8 @@ class RegisterInfo extends Component {
     } = this.props;
     validateFields((err, values) => {
       if (!err) {
-        console.log(values);
-        if (values.npi) {
+        console.log("values",values);
+       if (values.npi) {
           this.setState(
             {
               isLoading: true
@@ -85,7 +85,7 @@ class RegisterInfo extends Component {
           <div className="">
             <FormItem>
               {getFieldDecorator("userType", {
-                rules: [rules.required("Please select a User Type!")],
+               // rules: [rules.required("Please select a User Type!")],
                 initialValue: "user"
               })(
                 <Radio.Group>
@@ -99,7 +99,7 @@ class RegisterInfo extends Component {
             <div className="">
               <FormItem>
                 {getFieldDecorator("npi", {
-                  rules: [rules.required("NPI Number is required")]
+                 //// rules: [rules.required("NPI Number is required")]
                 })(<Input placeholder="NPI Number" />)}
               </FormItem>
             </div>
@@ -111,7 +111,7 @@ class RegisterInfo extends Component {
                   <div className="col-sm-6">
                     <FormItem>
                       {getFieldDecorator("email", {
-                        rules: [rules.required("Please input your Email!")]
+                       // rules: [rules.required("Please input your Email!")]
                       })(
                         <Input
                           prefix={
@@ -128,13 +128,13 @@ class RegisterInfo extends Component {
                   <div className="col-sm-6">
                     <FormItem>
                       {getFieldDecorator("phone", {
-                        rules: [
-                          rules.required("Please input your Phone!"),
-                          {
-                            pattern: /^\d{10}$/,
-                            message: "Please enter a valid Phone Number"
-                          }
-                        ]
+                       // rules: [
+                       //   rules.required("Please input your Phone!"),
+                     //     {
+                       //     pattern: /^\d{10}$/,
+                      //      message: "Please enter a valid Phone Number"
+                      //    }
+                     //   ]
                       })(
                         <Input
                           prefix={
@@ -154,7 +154,7 @@ class RegisterInfo extends Component {
                 <div className="col-sm-6">
                   <FormItem>
                     {getFieldDecorator("password", {
-                      rules: [rules.required("Please input a Password!")]
+                     // rules: [rules.required("Please input a Password!")]
                     })(
                       <Input
                         prefix={
@@ -172,16 +172,16 @@ class RegisterInfo extends Component {
                 <div className="col-sm-6">
                   <FormItem>
                     {getFieldDecorator("repassword", {
-                      rules: [
-                        rules.required("Please retype your Password!"),
-                        {
-                          validator: (rule, value) => {
-                            if (value !== getFieldValue("password"))
-                              return Promise.reject("Passwords don't match");
-                            return Promise.resolve();
-                          }
-                        }
-                      ]
+                     // rules: [
+                     //   rules.required("Please retype your Password!"),
+                     //   {
+                     //     validator: (rule, value) => {
+                      //      if (value !== getFieldValue("password"))
+                       //       return Promise.reject("Passwords don't match");
+                      //      return Promise.resolve();
+                       //   }
+                     //   }
+                      //]
                     })(
                       <Input
                         prefix={
@@ -202,9 +202,9 @@ class RegisterInfo extends Component {
                   <div className="col-sm-6">
                     <FormItem>
                       {getFieldDecorator("state", {
-                        rules: [
-                          { required: true, message: "Please select state!" }
-                        ],
+                       // rules: [
+                     //     { required: true, message: "Please select state!" }
+                     //   ],
                         onChange: a => {
                           setFieldsValue({
                             city: cityJson[a][0]
@@ -224,9 +224,9 @@ class RegisterInfo extends Component {
                   <div className="col-sm-6">
                     <FormItem>
                       {getFieldDecorator("city", {
-                        rules: [
-                          { required: true, message: "Please select City!" }
-                        ]
+                       // rules: [
+                        //  { required: true, message: "Please select City!" }
+                     //   ]
                       })(
                         <Select
                           disabled={!getFieldValue("state")}

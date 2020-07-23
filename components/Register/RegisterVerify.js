@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Form, Icon, Input, Select, Radio, DatePicker, Upload, Button, Spin } from 'antd';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { registerDoctor } from '../../services/api/doctors.js';
 const {
     Item : FormItem
@@ -10,8 +11,25 @@ import cityJson from '../../constants/US_States_and_Cities.json';
 import Loader from '../loader/Loader.js';
 import ErrorAlert from '../error/ErrorAlert.js';
 import rules from '../../services/validations/rules.js';
-import { registerPatient } from '../../services/api/index.js';
+import { registerPatient ,uploadimagepatient} from '../../services/api/index.js';
 const stateList = Object.keys(cityJson)
+function getBase64(img, callback) {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result));
+    reader.readAsDataURL(img);
+  }
+  
+  function beforeUpload(file) {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('You can only upload JPG/PNG file!');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('Image must smaller than 2MB!');
+    }
+    return isJpgOrPng && isLt2M;
+  }
 class RegisterVerify extends Component {
     constructor(){
         super()
@@ -19,6 +37,8 @@ class RegisterVerify extends Component {
             isLoading: false,
             err: "",
             errMsg: "",
+            files:[],
+            imageUrl:""
         }
     }
     handleSubmit = (e)=> {
@@ -53,28 +73,35 @@ class RegisterVerify extends Component {
                             ...infoDetail,
                             ...restValues
                         }
-                        registerDoctor(doctorDetails)
-                        .then(({data}) => {
-                            if(data.status){
-                                this.setState({
-                                    isLoading: false
-                                })
-                                onSubmit(data.data)
-                            }else{
-                                this.setState({
-                                    isLoading: false,
-                                    errMsg: data.message,
-                                    err: true
-                                })
-                            }
-                            console.log({res})
-                        }).catch(err => {
-                            this.setState({
-                                err,
-                                errMsg: err.response?.data?.error,
-                                isLoading: false
-                            })
-                        } )
+                        this.setState({
+                                        isLoading: false
+                                    });
+                                  
+                                       
+                                  
+                                    onSubmit()
+                        // registerDoctor(doctorDetails)
+                        // .then(({data}) => {
+                        //     if(data.status){
+                        //         this.setState({
+                        //             isLoading: false
+                        //         })
+                        //         onSubmit(data.data)
+                        //     }else{
+                        //         this.setState({
+                        //             isLoading: false,
+                        //             errMsg: data.message,
+                        //             err: true
+                        //         })
+                        //     }
+                        //     console.log({res})
+                        // }).catch(err => {
+                        //     this.setState({
+                        //         err,
+                        //         errMsg: err.response?.data?.error,
+                        //         isLoading: false
+                        //     })
+                        // } )
                     }else{
                         const {
                             repassword,
@@ -84,32 +111,64 @@ class RegisterVerify extends Component {
                             ...infoRest,
                             ...values
                         }
-                        registerPatient(userValues).then(({data}) => {
-                            if(data.status){
-                                this.setState({
-                                    isLoading: false
-                                })
-                                onSubmit(data.data)
-                            }else{
-                                this.setState({
-                                    isLoading: false,
-                                    errMsg: data.message,
-                                    err: true
-                                })
-                            }
-                            console.log({res})
-                        }).catch(err => {
-                            this.setState({
-                                err,
-                                errMsg: err.response?.data?.error,
-                                isLoading: false
-                            })
-                        } )
+                        this.setState({
+                                         isLoading: false
+                                     })
+                                    onSubmit();
+                                    if(this.state.imageUrl){
+                                        let files= new FormData()
+
+                                        files.append('files', this.state.files)
+                                        uploadimagepatient(files).then(data=>{
+                                            console.log(data);
+                                        }).catch(err=>console.log(err));
+                                    }
+                        // registerPatient(userValues).then(({data}) => {
+                        //     if(data.status){
+                        //         this.setState({
+                        //             isLoading: false
+                        //         })
+                        //         onSubmit(data.data)
+                        //     }else{
+                        //         this.setState({
+                        //             isLoading: false,
+                        //             errMsg: data.message,
+                        //             err: true
+                        //         })
+                        //     }
+                        //     console.log({res})
+                        // }).catch(err => {
+                        //     this.setState({
+                        //         err,
+                        //         errMsg: err.response?.data?.error,
+                        //         isLoading: false
+                        //     })
+                        // } )
                     }
                 })
             }
         })
     }
+
+    handleChange = info => {
+        if (info.file.status === 'uploading') {
+          this.setState({ isLoading: true });
+          return;
+        }
+        if (info.file.status === 'done') {
+          // Get this url from response in real world.
+          console.log(info.file);
+          this.setState({files:info.file.originFileObj});
+          
+          getBase64(info.file.originFileObj, imageUrl =>{
+            console.log(imageUrl);
+            this.setState({
+              imageUrl,
+              isLoading: false,
+            })
+          });
+        }
+      };
     compareToFirstPassword = (rule, value, callback) => {
         const { form } = this.props;
         if (value && value !== form.getFieldValue('password')) {
@@ -133,11 +192,18 @@ class RegisterVerify extends Component {
             infoFormDetails, specialities
         } = this.props
         const {
-            isLoading, errMsg
+            isLoading, errMsg,imageUrl
         } = this.state
         const firstName = (infoFormDetails.basic?.first_name || "").toLowerCase()
         const lastName = (infoFormDetails.basic?.last_name || "").toLowerCase()
         const specialitiesList  = specialities.map(({name})   => ({name}))
+
+        const uploadButton = (
+            <div>
+              {this.state.isLoading ? <LoadingOutlined /> : <PlusOutlined />}
+              <div className="ant-upload-text">Upload</div>
+            </div>
+          );
 
         return (
             <div className="c-register-info pt-5">
@@ -147,12 +213,30 @@ class RegisterVerify extends Component {
                     </div>
                     
                     <div className="row">
+                        <div className="col-sm-12">
+                            <FormItem>
+                            
+                            <Upload
+                                    name="avatar"
+                                    listType="picture-card"
+                                    className="avatar-uploader"
+                                    showUploadList={false}
+                                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                    beforeUpload={beforeUpload}
+                                    onChange={this.handleChange}
+                                >
+                                    {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+                                </Upload>
+                                    
+                            
+                            </FormItem>
+                        </div>
                         <div className="col-sm-6">
                             <FormItem>
                                 {
                                     getFieldDecorator("first_name", {
                                         rules: [
-                                            rules.required("Please Input Your First Name"),
+                                            //rules.required("Please Input Your First Name"),
                                         ],
                                         initialValue: firstName
                                     })(
@@ -169,7 +253,7 @@ class RegisterVerify extends Component {
                                 {
                                     getFieldDecorator("last_name", {
                                         rules: [
-                                            rules.required("Please Input Your Last Name"),
+                                            //rules.required("Please Input Your Last Name"),
                                         ],
                                         initialValue: lastName
                                     })(
@@ -193,7 +277,7 @@ class RegisterVerify extends Component {
                                             {
                                                 getFieldDecorator("email", {
                                                     rules: [
-                                                        rules.required("Please Input Your First Name"),
+                                                        //rules.required("Please Input Your First Name"),
                                                         rules.email(),
                                                     ],
                                                 })(
@@ -210,7 +294,7 @@ class RegisterVerify extends Component {
                                             {
                                                 getFieldDecorator("phone", {
                                                     rules: [
-                                                        rules.required("Please Input Your Phone"),
+                                                        //rules.required("Please Input Your Phone"),
                                                     ],
                                                 })(
                                                     <Input
@@ -229,7 +313,7 @@ class RegisterVerify extends Component {
                                         {
                                             getFieldDecorator("password", {
                                                 rules: [
-                                                    rules.required("Please Input Your Password"),
+                                                    //rules.required("Please Input Your Password"),
                                                     {
                                                         validator: this.validateToNextPassword,
                                                     }
@@ -249,7 +333,7 @@ class RegisterVerify extends Component {
                                         {
                                             getFieldDecorator("repassword", {
                                                 rules: [
-                                                    rules.required("Please Re-enter Your Password"),
+                                                    //rules.required("Please Re-enter Your Password"),
                                                     {
                                                         validator: this.compareToFirstPassword
                                                     }
@@ -271,7 +355,9 @@ class RegisterVerify extends Component {
                                         <FormItem>
                                             {
                                                 getFieldDecorator("state", {
-                                                    rules: [{ required: true, message: 'Please select state!' }],
+                                                    rules: [{ 
+                                                       // required: true, message: 'Please select state!'
+                                                     }],
                                                     onChange: (a)=> {
                                                         setFieldsValue({
                                                             city: cityJson[a][0]
@@ -293,7 +379,9 @@ class RegisterVerify extends Component {
                                         <FormItem>
                                             {
                                                 getFieldDecorator("city", {
-                                                    rules: [{ required: true, message: 'Please select City!' }],
+                                                    rules: [{ 
+                                                       // required: true, message: 'Please select City!' 
+                                                    }],
                                                 })(
                                                     <Select
                                                         disabled={!getFieldValue("state")}
@@ -313,7 +401,9 @@ class RegisterVerify extends Component {
                                 <FormItem>
                                     {
                                         getFieldDecorator("experience", {
-                                            rules: [{ required: true, message: 'Please input your experience!' }],
+                                            rules: [{ 
+                                               // required: true, message: 'Please input your experience!' 
+                                            }],
                                         })(
                                             <Input
                                                 placeholder="Years of experience"
@@ -328,7 +418,9 @@ class RegisterVerify extends Component {
                                     <FormItem>
                                         {
                                             getFieldDecorator("dob", {
-                                                rules: [{ required: true, message: 'Please input your experience!' }],
+                                                rules: [{ 
+                                                   // required: true, message: 'Please input your experience!'
+                                                 }],
                                             })(
                                                 <DatePicker
                                                     className="d-block"
@@ -342,7 +434,9 @@ class RegisterVerify extends Component {
                                     <FormItem>
                                         {
                                             getFieldDecorator("speciality", {
-                                                rules: [{ required: true, message: 'Please input your speciality!' }],
+                                                rules: [{ 
+                                                    //required: true, message: 'Please input your speciality!'
+                                                 }],
                                             })(
                                                 <Select
                                                     placeholder="Speciality"
